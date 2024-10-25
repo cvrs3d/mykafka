@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
 	"net"
 	"os"
@@ -59,7 +58,7 @@ func main() {
 			response[5] = byte(correlationId >> 16)
 			response[6] = byte(correlationId >> 8)
 			response[7] = byte(correlationId)
-			requestApiVersion := uint16(buffer[2]) << 8 | uint16(buffer[3])
+			requestApiVersion := int16(buffer[2]) << 8 | int16(buffer[3])
 			if requestApiVersion < 0 || requestApiVersion > 4 {
 				response = append(response, 0, 35)
 			} else {
