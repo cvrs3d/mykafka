@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 	"os"
@@ -31,6 +32,21 @@ func main() {
 	// Deferring the close of the connection, so it's closed when the function returns
 	defer conn.Close()
 
-	conn.Read(make([]byte, 1024))
-	conn.Write([]byte{0, 0, 0, 0, 0, 0, 0, 7})
+	// Create a buffer to read the incoming data
+	buffer := (make([]byte, 1024))
+
+	// Read the incoming connection into the buffer
+	_, err = conn.Read(buffer)
+	if err != nil {
+		fmt.Println("Error reading:", err.Error())
+		os.Exit(1)
+	}
+
+	// Print the incoming message
+	fmt.Printf("Received message: %v  (%d)\n", buffer[8:12], int32(binary.BigEndian.Uint32(buffer[8:12])))
+	resp := make([]byte, 8)
+	copy(resp, []byte{0, 0, 0, 0})
+	copy(resp[4:], buffer[8:12])
+	conn.Write(resp)
+	conn.Close()
 }
